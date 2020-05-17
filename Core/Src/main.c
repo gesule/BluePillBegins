@@ -24,6 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "usbd_cdc_if.h"
 
 /* USER CODE END Includes */
 
@@ -75,28 +76,64 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
 
   /* Configure the system clock */
-	SystemClock_Config();
+  SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+
 
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-	MX_GPIO_Init();
-	MX_USB_DEVICE_Init();
+  MX_GPIO_Init();
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
+
+  // Se arranca el display
+  lcd_startup();
+
+#define X0 10
+#define Y0 10
+#define Xf 229
+#define Yf 309
+
+
+
+  lcd_draw_vline(X0,0, 319, ILI9341_LIGHTGREY);
+  lcd_draw_vline(Xf,0, 319, ILI9341_DARKGREY);
+  lcd_draw_hline(0, Y0, 239, ILI9341_LIGHTGREY);
+  lcd_draw_hline(0, Yf, 239, ILI9341_DARKGREY);
+
+  lcd_draw_fill_rect(25, 20, 50, 80, ILI9341_GREEN );
+
+  lcd_draw_fill_rect(125, 20, 50, 80, ILI9341_RED );
+
+  lcd_draw_line(X0, Y0, Xf, Yf, ILI9341_BLUE);
+  lcd_draw_line(Xf, Y0, X0, Yf, ILI9341_BLUE);
+
+  lcd_draw_fill_rect(0, 300, 239, 310, ILI9341_YELLOW );
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+	//extern USBD_HandleTypeDef hUsbDeviceFS;
+
+	// buffer para montar el texto que se enviará al USB-CDC
+	char strbuf[256];
+	uint16_t count = 0;
+
+
+	// Espera hasta que se conecte
+	//while (hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED);
+
 
   while (1)
   {
@@ -104,7 +141,10 @@ int main(void)
 	  if(HAL_GetTick() > blink_timer) {
 		  blink_timer = HAL_GetTick() + 499;
 		  HAL_GPIO_TogglePin(boardLed_GPIO_Port, boardLed_Pin);
+		  //sprintf(strbuf, "Contador = %u\n", count++);
+		  //CDC_Transmit_FS((uint8_t*)strbuf, strlen(strbuf));
 	  }
+
 
     /* USER CODE END WHILE */
 
